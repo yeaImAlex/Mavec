@@ -58,17 +58,6 @@ class OakDCamera:
 
         cv2.destroyAllWindows()
 
-    def get_image(self):
-        """
-        This function returns the last captured image from the video stream.
-        """
-        if frame is None:
-            print("No frame captured yet.")
-            return None
-        else:
-            last_frame = frame
-            return last_frame
-
 
 # Example usage
 if __name__ == "__main__":

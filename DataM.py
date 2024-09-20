@@ -47,7 +47,8 @@ if __name__ == '__main__':
         if img is not None:
             saveData(img, 0)
             cv2.waitKey(1)
-            cv2.imshow('Image', img)
+            resized_img = cv2.resize(img, (320,240))
+            cv2.imshow('Image', resized_img)
         else:
             print('Image is not captured')
     saveLog()

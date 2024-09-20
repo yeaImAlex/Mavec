@@ -83,3 +83,5 @@ if __name__ == "__main__":
         cv2.imwrite("last_captured_image.jpg", image)
         print("Last image captured and saved as 'last_captured_image.jpg'.")
 
+
+

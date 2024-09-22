@@ -50,7 +50,7 @@ class OakDCamera:
         while True:
             frame = self.get_video(display=True)
             # Display the frame
-            frame = cv2.resize(frame, (240, 180))
+            frame = cv2.resize(frame, (320, 240))
             cv2.imshow("Video Stream", frame)
 
             # End display when 'q' key is pressed

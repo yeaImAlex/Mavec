@@ -33,7 +33,7 @@ class OakDCamera:
         # Placeholder for last captured frame
         self.last_frame = None
 
-    def get_video(self, display=False):
+    def get_video(self):
         """
         This function returns a generator that yields frames from the video stream.
         """
@@ -42,7 +42,7 @@ class OakDCamera:
 
         return frame
 
-    def video_displayed(self):
+    def video_displayed(self, display=False):
         """
         This function displays the video stream until the 'q' key is pressed.
         """

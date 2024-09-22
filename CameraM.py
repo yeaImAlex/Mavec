@@ -33,7 +33,7 @@ class OakDCamera:
         # Placeholder for last captured frame
         self.last_frame = None
 
-    def get_video(self):
+    def get_video(self, display=False):
         """
         This function returns a generator that yields frames from the video stream.
         """
@@ -47,8 +47,10 @@ class OakDCamera:
         This function displays the video stream until the 'q' key is pressed.
         """
         print("Press 'q' to exit the video display...")
-        for frame in self.get_video():
+        while True:
+            frame = self.get_video(display=True)
             # Display the frame
+            frame = cv2.resize(frame, (240, 180))
             cv2.imshow("Video Stream", frame)
 
             # End display when 'q' key is pressed
@@ -66,11 +68,8 @@ if __name__ == "__main__":
     # Display the video until 'q' is pressed
     oakd_camera.video_displayed()
 
-    # Get the last captured image and save it (optional)
-    image = oakd_camera.get_image()
-    if image is not None:
-        cv2.imwrite("last_captured_image.jpg", image)
+    image = oakd_camera.get_video()
+
+    if frame is not None:
+        cv2.imwrite("last_captured_image.jpg", frame)
         print("Last image captured and saved as 'last_captured_image.jpg'.")
-
-
-

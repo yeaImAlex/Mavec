@@ -21,6 +21,28 @@ def main():
 
     try:
         while True:
+            if keyboard.getKey('e'):
+                camera_thread.start()
+
+            if jsM.getKey('z'):
+                if record == 0:
+                record = 1
+                print('Recording started...')
+                sleep(0.300)
+                img = wM.getImg(True, size=[240,120])
+                dcM.saveData(img, steering)
+            else:
+                print('Recording already started')
+
+            elif jsM.getKey('x'):
+                if record == 1:
+                record = 0
+                print('Recording stop...')
+                sleep(0.300)
+                dcM.saveLog()
+                else:
+                print('Recording already stopped')
+                
             if keyboard.getKey('w'):
                 angle = 100
                 motor.move_forward(60)
@@ -37,8 +59,6 @@ def main():
                 if angle > 180:
                     angle = 180
                 motor.set_steering_angle(angle)
-            elif keyboard.getKey('e'):
-                camera_thread.start()
                 
             else:
                 motor.stop_motor()

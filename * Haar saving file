@@ -1,0 +1,87 @@
+import cv2
+import os
+import time
+import depthai as dai
+
+myPath = r"C:\Users\ycwon\Desktop\Training file\Training for boom sign"  # Ensure this path is correct
+cameraBrightness = 190  # Not directly applicable for OAK-D
+moduleVal = 10  # SAVE EVERY ITH FRAME TO AVOID REPETITION
+minBlur = 500  # SMALLER VALUE MEANS MORE BLURRINESS PRESENT
+grayImage = False  # IMAGES SAVED COLORED OR GRAY
+saveData = True  # SAVE DATA FLAG
+showImage = True  # IMAGE DISPLAY FLAG
+imgWidth = 180
+imgHeight = 120
+
+# Global variable for folder counting
+global countFolder
+
+# DepthAI Pipeline setup for OAK-D camera
+pipeline = dai.Pipeline()
+
+# Set up the color camera node
+camRgb = pipeline.createColorCamera()
+camRgb.setPreviewSize(640, 480)  # Frame size
+camRgb.setInterleaved(False)
+camRgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)  # Updated to avoid deprecation warning
+
+# XLinkOut for streaming the color video output
+xoutVideo = pipeline.createXLinkOut()
+xoutVideo.setStreamName("video")
+camRgb.video.link(xoutVideo.input)
+
+# Create directories for storing images if needed
+if saveData:
+    if not os.path.exists(myPath):
+        os.makedirs(myPath)
+
+# Connect to the device and start the pipeline
+try:
+    with dai.Device(pipeline) as device:
+        print("Connected to OAK-D camera")
+
+        # Increase queue size to handle more frames without overflowing
+        videoQueue = device.getOutputQueue(name="video", maxSize=15, blocking=False)
+
+        count = 0
+        while True:
+            try:
+                inFrame = videoQueue.get()  # Try to get the frame
+                img = inFrame.getCvFrame()  # Get the frame from the OAK-D camera
+
+                # Resize the image as needed
+                img = cv2.resize(img, (imgWidth, imgHeight))
+
+                # Convert to grayscale if required
+                if grayImage:
+                    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+                # Calculate blur using Laplacian method
+                blur = cv2.Laplacian(img, cv2.CV_64F).var()
+
+                # If the image is not too blurry, save it
+                if blur > minBlur:
+                    if saveData and count % moduleVal == 0:
+                        nowTime = time.time()
+                        cv2.imwrite(f"{myPath}/{nowTime}.jpg", img)
+                        print(f"Image saved: {myPath}/{nowTime}.jpg")
+
+                # Show the image if the flag is set
+                if showImage:
+                    cv2.imshow("Result", img)
+
+                count += 1
+
+            except RuntimeError as e:
+                # Handle communication errors gracefully
+                print(f"Error occurred while fetching frame: {e}")
+                break  # Exit the loop on error
+
+            # Exit when 'q' is pressed
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+except Exception as e:
+    print(f"Failed to connect to OAK-D camera: {e}")
+
+cv2.destroyAllWindows()
